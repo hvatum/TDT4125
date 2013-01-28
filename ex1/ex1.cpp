@@ -5,13 +5,54 @@
 #include <algorithm>
 #include <chrono>
 
+#include <climits>
+
 using namespace std;
 using namespace std::placeholders;
+
+#define NO_ANSWER_YET INT_MAX
+
+class Coin_counter {
+    public:
+        Coin_counter(uint32_t n, vector<uint32_t>* c) : coins(c), num_coins(n) {};
+        uint32_t num_coins;
+        vector<uint32_t>* coins;
+};
+
+Coin_counter* optimal(const vector<Coin_counter*>& dp, uint32_t value){
+    // TODO: Implement this function
+    return new Coin_counter(1,new vector<uint32_t>(dp[0]->coins->size(), 0));
+}
 
 vector<uint32_t> calculateMinimumCoins(const vector<uint32_t>& coins, uint32_t value){
     vector<uint32_t> ret(coins.size(), 0);
 
     //Your code here
+    printf("Total value is %d, and coins avaliable are:\n", value);
+    // Create DP-table with one entry for each value from 0 up until value
+    Coin_counter no_answer(NO_ANSWER_YET, NULL);
+    vector<Coin_counter*> dp(value + 1, &no_answer);
+
+    // Set all basis-elements to 1, since we only need one coin if value = coin-value
+    vector<uint32_t >* zero = new vector<uint32_t>(coins.size(), 0);
+    dp[0] = new Coin_counter(0, zero);
+    for (int i = 0; i < coins.size(); i++)
+    {
+        printf("\t%d\n", coins[i]);
+        if (coins[i] >= value) break;
+        vector<uint32_t>* single_coin_answer = new vector<uint32_t>(coins.size(), 0);
+        (*single_coin_answer)[i] = 1;
+        dp[coins[i]] = new Coin_counter(1, single_coin_answer);
+
+    }
+
+    for (int current = 0; current <= value; current++)
+    {
+        if (dp[current] != &no_answer) continue;
+        else dp[current] = optimal(dp, current);
+    }
+
+    ret = *(dp[value]->coins);
 
     return ret;
 }
