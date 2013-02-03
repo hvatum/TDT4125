@@ -4,6 +4,11 @@
 #include <cassert>
 using namespace std;
 
+/*
+ * Implement algo. 3.3.2.4 from Hromkovic
+ * Improve with 3.3.2.6
+ */
+
 //Example graphs, both with min vertex cover = 2
 const vector<vector<uint32_t>> graph1 = {
                                     {1, 2, 3},
@@ -25,7 +30,23 @@ bool hasVertexCover(const vector<vector<uint32_t>>& graph, int k){
 
     //Your code here
 
+    // H is all vertices with degree above k
+    vector<vector<uint32_t>*> H();
+    vector<vector<uint32_t>*> invgraph(graph);
+    for (vector<uint32_t> vertex : graph)
+    {
+        if (vertex.size() > k) H.push_back(&vertex);
+        else invgraph.push_back(&vertex);
+    }
+
+    // If there are more vertices of degree > k than k, we are out of luck (observation 3.3.2.2)
+    if (H.size() > k) return false;
+
+    uint32_t m = k - H.size();
+
     return true;
+
+
 }
 
 int main(){
