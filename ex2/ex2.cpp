@@ -69,6 +69,9 @@ bool exhaustiveSearch(const vector<vector<uint32_t>>& graph, int k, bool **cover
 
 bool hasVertexCover(const vector<vector<uint32_t>>& graph, int k){
 
+/*    if (k==2)
+        printf("Debug\n");
+        */
     //Your code here
     if (graph.size() <= k)
         return true;
@@ -110,23 +113,13 @@ bool hasVertexCover(const vector<vector<uint32_t>>& graph, int k){
     }
 
     // Remove "cover" on those that really exist
-    for (uint32_t i = 0; i < graph.size(); i++)
-        for (uint32_t edge : graph[i])
+    for (uint32_t i = 0; i < invgraph.size(); i++)
+        for (uint32_t edge : invgraph[i])
         {
             covered[i][edge] = false;
             covered[edge][i] = false;
         }
 
-        printf("\n");
-        printf("\n");
-    for (uint32_t x = 0; x < graph.size(); x++)
-    {
-        for (uint32_t y = 0; y < graph.size(); y++)
-            printf("%s", covered[x][y]?"1\t":"0\t");
-        printf("\n");
-    }
-        printf("\n");
-        printf("\n");
     // Do the search
     bool result = exhaustiveSearch(invgraph, m, covered, included, 0, 0);
     for (uint32_t x = 0; x < graph.size(); x++)
