@@ -1,3 +1,3 @@
-CXXFLAGS+= -std=c++11 -O3 -Wall -Wextra
+CXXFLAGS+= -std=c++11 -O0 -Wall -Wextra -g
 
 ex2: 
