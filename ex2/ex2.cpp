@@ -27,106 +27,23 @@ const vector<vector<uint32_t>> graph2 = {
 
 const vector<vector<uint32_t>> graph3 = {};
 
-bool exhaustiveSearch(const vector<vector<uint32_t>>& graph, int k, bool **covered, bool included[], int cover_size, uint32_t i)
-{
-    if (cover_size > k)
-        return false;
-    if (i >= graph.size())
-        return false;
-    
-    bool has_cover = true;
-    for (uint32_t x = 0; x < graph.size(); x++)
-        for (uint32_t y = 0; y < graph.size(); y++)
-            if (!covered[x][y]) has_cover = false;
-    if (has_cover) return true;
-
-    bool **new_covered;
-    new_covered = (bool**)malloc(sizeof(bool*)*graph.size());
-    bool new_included[graph.size()];
-    for (uint32_t x = 0; x < graph.size(); x++)
-    {
-        new_covered[x] = (bool*)malloc(sizeof(bool)*graph.size());
-        for (uint32_t y = 0; y < graph.size(); y++)
-            new_covered[x][y] = covered[x][y];
-    }
-    for (uint32_t i = 0; i < graph.size(); i++)
-        new_included[i] = included[i];
-
-    new_included[i] = true;
-    vector<uint32_t> vertex = graph[i];
-    for (uint32_t edge : vertex)
-    {
-        new_covered[i][edge] = true;
-        new_covered[edge][i] = true;
-    }
-    bool result = exhaustiveSearch(graph, k, new_covered, new_included, cover_size+1, i+1)
-        || exhaustiveSearch(graph, k, covered, included, cover_size, i+1);
-    for (uint32_t x = 0; x < graph.size(); x++)
-        free(new_covered[x]);
-    free(new_covered);
-    return result;
-}
 
 bool hasVertexCover(const vector<vector<uint32_t>>& graph, int k){
 
-/*    if (k==2)
-        printf("Debug\n");
-        */
     //Your code here
-    if (graph.size() <= k)
-        return true;
-
-    // H is all vertices with degree above k
-    vector<vector<uint32_t>> H;
-    vector<vector<uint32_t>> invgraph;
+    
+    // Find all vertices of G with degree greater than k
+    vector<vector<uint32_t>> v_gt_k;
     for (vector<uint32_t> vertex : graph)
-    {
-        if (vertex.size() > k) H.push_back(vertex);
-        else invgraph.push_back(vertex);
-    }
+        if (vertex.size() > k) v_gt_k.push_back();
 
-    // If there are more vertices of degree > k than k, we are out of luck (observation 3.3.2.2)
-    if (H.size() > k)
-        return false;
+    if (v_gt_k.size() > k) return false;
+
+    int m = k - v_gt_k.size();
 
 
-    uint32_t m = k - H.size();
 
-    if (invgraph.size() > m*(k+1))
-        return false;
 
-    // Exhaustive search in invgraph
-
-    // Specify that no nodes are included
-    bool included[graph.size()];
-    for (uint32_t i = 0; i < graph.size(); i++)
-        included[i] = false;
-
-    // Find all edges
-    bool **covered;
-    covered = (bool**)malloc(sizeof(bool*)*graph.size());
-    for (uint32_t x = 0; x < graph.size(); x++)
-    {
-        covered[x] = (bool*)malloc(sizeof(bool)*graph.size());
-        for (uint32_t y = 0; y < graph.size(); y++)
-            covered[x][y] = true;
-    }
-
-    // Remove "cover" on those that really exist
-    for (uint32_t i = 0; i < invgraph.size(); i++)
-        for (uint32_t edge : invgraph[i])
-        {
-            covered[i][edge] = false;
-            covered[edge][i] = false;
-        }
-
-    // Do the search
-    bool result = exhaustiveSearch(invgraph, m, covered, included, 0, 0);
-    for (uint32_t x = 0; x < graph.size(); x++)
-    {
-        free(covered[x]);
-    }
-    free(covered);
     return result;
 }
 
