@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cassert>
 #include <cstring>
+#include <algorithm>
+
 using namespace std;
 
 /*
@@ -27,24 +29,98 @@ const vector<vector<uint32_t>> graph2 = {
 
 const vector<vector<uint32_t>> graph3 = {};
 
+void removeNode(vector<vector<uint32_t>>& graph, int node){
+            graph[node].clear();
+            for (vector<uint32_t> n : graph)
+                remove(n.begin(), n.end(), node);
+}
 
-bool hasVertexCover(const vector<vector<uint32_t>>& graph, int k){
+uint32_t removeGradeGT(vector<vector<uint32_t>>& graph, uint32_t k){
+    uint32_t n = 0;
+    for (uint32_t i = 0; i < graph.size(); i++)
+        if (graph[i].size() > k)
+        {
+            removeNode(graph, i);
+            n++;
+        }
+    return n;
+}
+
+void cover(vector<vector<bool>> &covered, uint32_t node)
+{
+   for (uint32_t x = 0; x < covered.size(); x++)
+   {
+           covered[x][node] = true;
+           covered[node][x] = true;
+   }
+}
+
+
+bool exhaustingSearch(
+        const vector<vector<uint32_t>>& graph,
+        uint32_t k,
+        vector<vector<bool>> covered,
+        vector<uint32_t> set,
+        uint32_t current_node
+        )
+{
+    // Is set too large, or are we out of new nodes to try?
+    if (set.size() > k || current_node >= graph.size()) return false;
+
+
+    bool allCovered = true;
+    for (uint32_t x = 0; x < graph.size(); x++)
+        for (uint32_t y = 0; y < graph.size(); y++)
+            allCovered &= covered[x][y];
+    if (allCovered) return true;
+
+    vector<vector<bool>> newCovered(covered);
+    vector<uint32_t> newSet(set);
+
+    if (exhaustingSearch(graph, k, covered, set, current_node+1)) return true;
+
+    cover(newCovered, current_node);
+    newSet.push_back(current_node);
+
+    return exhaustingSearch(graph, k, newCovered, newSet, current_node+1);
+}
+
+bool exhaustingSearch(const vector<vector<uint32_t>>& graph, uint32_t k){
+
+    vector<vector<bool>> covered(graph.size(), vector<bool> (graph.size(), true));
+    vector<uint32_t> set;
+    for (uint32_t x = 0; x < graph.size(); x++)
+        for(uint32_t edge : graph[x])
+        {
+            covered[x][edge] = false;
+            covered[edge][x] = false;
+        }
+    return
+        exhaustingSearch(graph, k, covered, set, 0);
+}
+
+bool hasVertexCover(const vector<vector<uint32_t>>& graph, uint32_t k){
 
     //Your code here
-    
-    // Find all vertices of G with degree greater than k
-    vector<vector<uint32_t>> v_gt_k;
-    for (vector<uint32_t> vertex : graph)
-        if (vertex.size() > k) v_gt_k.push_back();
+    if (k >= graph.size()) return true;
 
-    if (v_gt_k.size() > k) return false;
+    // Remove all vertices from G with degree greater than k and put in G'
+    // A graph H of size |H| is the number of vertices with degree > k
+    vector<vector<uint32_t>> Gm(graph);
+    uint32_t size_H = removeGradeGT(Gm, k);
 
-    int m = k - v_gt_k.size();
+    // If |H| > k return false
+    if (size_H > k) return false;
+    // else |H| =< k
+    uint32_t m = k - size_H;
 
+    // If G' has more than m(k+1) vertices, return false
+    if (Gm.size() > m*(k+1)) return false;
 
-
-
-    return result;
+    if (graph.size() == Gm.size())
+        return exhaustingSearch(Gm, m);
+    else
+        return hasVertexCover(Gm, m);
 }
 
 
