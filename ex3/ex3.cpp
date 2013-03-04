@@ -79,8 +79,22 @@ vector<vector<int>> removeVertex(const vector<vector<int>>& graph, int node)
 
 }
 
+/*
+ * Finding an approximation to a minimal vertex cover using simulated annealing
+ */
+vector<int> minVertexCoverSA(const vector<vector<int>>& graph, unsigned int temp){
+   for (int i = 0; i < graph.size(); i++)
+   {
+        
+   }
+}
+
+
+/*
+ * Finding the minimal vertex cover of a graph using branch-and-bound technices
+ */
 unsigned int globalBest = 999999999;
-vector<int> minVertexCoverBB(const vector<vector<int>>& graph, int level){
+vector<int> minVertexCoverBB(const vector<vector<int>>& graph, unsigned int level){
     //your code here
     vector<int> best;
 
@@ -105,7 +119,7 @@ vector<int> minVertexCoverBB(const vector<vector<int>>& graph, int level){
 }
 
 vector<int> minVertexCover(const vector<vector<int>>& graph){
-    globalBest = graph.size();
+    globalBest = minVertexCoverSA(graph,1000).size();
     return minVertexCoverBB(graph,0);
 }
 
